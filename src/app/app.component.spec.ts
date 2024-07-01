@@ -1,29 +1,65 @@
-import { TestBed } from '@angular/core/testing';
-import { AppComponent } from './app.component';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ReactiveFormsModule } from '@angular/forms';
+import { AppComponent } from './app.component'; // Import the AppComponent here
 
 describe('AppComponent', () => {
+  let component: AppComponent;
+  let fixture: ComponentFixture<AppComponent>;
+
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [AppComponent],
+      declarations: [],
+      imports: [ReactiveFormsModule],
     }).compileComponents();
   });
 
-  it('should create the app', () => {
-    const fixture = TestBed.createComponent(AppComponent);
-    const app = fixture.componentInstance;
-    expect(app).toBeTruthy();
-  });
-
-  it(`should have the 'dashboard5' title`, () => {
-    const fixture = TestBed.createComponent(AppComponent);
-    const app = fixture.componentInstance;
-    expect(app.title).toEqual('dashboard5');
-  });
-
-  it('should render title', () => {
-    const fixture = TestBed.createComponent(AppComponent);
+  beforeEach(() => {
+    fixture = TestBed.createComponent(AppComponent);
+    component = fixture.componentInstance;
     fixture.detectChanges();
-    const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('h1')?.textContent).toContain('Hello, dashboard5');
+  });
+
+  it('should create the app', () => {
+    expect(component).toBeTruthy();
+  });
+
+  it('form should be invalid when empty', () => {
+    expect(component.profileForm.valid).toBeFalsy();
+  });
+
+  it('email field validity', () => {
+    let email = component.profileForm.controls['email'];
+    expect(email.valid).toBeFalsy();
+
+    email.setValue('test@example.com');
+    expect(email.valid).toBeTruthy();
+  });
+
+  it('password field validity', () => {
+    let password = component.profileForm.controls['password'];
+    expect(password.valid).toBeFalsy();
+
+    password.setValue('password123');
+    expect(password.valid).toBeTruthy();
+  });
+
+  it('should call onSubmit method when form is submitted', () => {
+    spyOn(component, 'onSubmit');
+    let button = fixture.debugElement.nativeElement.querySelector('button');
+    button.click();
+    expect(component.onSubmit).toHaveBeenCalled();
+  });
+
+  it('should log form values when onSubmit is called', () => {
+    spyOn(console, 'log');
+    component.profileForm.setValue({
+      email: 'test@example.com',
+      password: 'password123'
+    });
+    component.onSubmit();
+    expect(console.log).toHaveBeenCalledWith({
+      email: 'test@example.com',
+      password: 'password123'
+    });
   });
 });
